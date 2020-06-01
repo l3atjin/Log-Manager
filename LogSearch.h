@@ -8,6 +8,7 @@
 #include <cmath>
 #include <iostream>
 #include <algorithm>
+#include <iterator>
 #include <getopt.h>
 
 using namespace std;
@@ -33,6 +34,17 @@ public:
 		{
 			return true;
 		}
+		else if (l1.numDate == l2.numDate)
+		{
+			if (l1.cat < l2.cat)
+			{
+				return true;
+			}
+			else if (l1.cat == l2.cat)
+			{
+				return l1.entry < l2.entry;
+			}
+		}
 		return false;
 	}
 };
@@ -41,9 +53,11 @@ class LogSearch
 {
 private:
 	vector<Log> masterList;
-	vector<Log*> sortedTS;
+	//vector<Log*> sortedTS;
 	deque<Log*> excerptList;
 	deque<Log*> recentList;
+	vector<Log>::iterator startRecent;
+	vector<Log>::iterator endRecent;
 	
 
 public:
@@ -67,7 +81,7 @@ public:
 			temp.msg = msg;
 			temp.entry = count;
 			masterList.push_back(temp);
-			sortedTS.push_back(&masterList[count]);
+			//sortedTS.push_back(&masterList[count]);
 			count++;
 		}
 		sort(masterList.begin(), masterList.end(), dateLess);
@@ -98,29 +112,42 @@ public:
 			// maybe fix it
 			string str = cmd.substr(2, 2) + cmd.substr(5, 2) + cmd.substr(8, 2) + cmd.substr(11, 2) + cmd.substr(14, 2);
 			string str1 = cmd.substr(17, 2) + cmd.substr(20, 2) + cmd.substr(23, 2) + cmd.substr(26, 2) + cmd.substr(29, 2);
-			cout << str << endl;
-			cout << str1 << endl;
 			long long num = stoi(str);
 			long long num1 = stoi(str1);
-			cout << num << endl;
-			cout << num1 << endl;
 			Log temp;
 			Log temp1;
-			//temp->numDate = num;
-			// can use iter
+			temp.numDate = num;
 			temp1.numDate = num1;
-			auto start = lower_bound(sortedTS.begin(), sortedTS.end(), temp, dateLess);
-			auto end = lower_bound(sortedTS.begin(), sortedTS.end(), temp1, dateLess);
-			cout << "Timestamps search: " << end - start << " entries found" << endl;
+			startRecent = lower_bound(masterList.begin(), masterList.end(), temp, dateLess);
+			endRecent = upper_bound(masterList.begin(), masterList.end(), temp1, dateLess);
+			cout << "Timestamps search: " << endRecent - startRecent << " entries found" << endl;
+		}
+		else if (cmd[0] == 'm')
+		{
+			string str = cmd.substr(2, 2) + cmd.substr(5, 2) + cmd.substr(8, 2) + cmd.substr(11, 2) + cmd.substr(14, 2);
+			long long num = stoi(str);
+			Log temp;
+			temp.numDate = num;
+			startRecent = lower_bound(masterList.begin(), masterList.end(), temp, dateLess);
+			endRecent = upper_bound(masterList.begin(), masterList.end(), temp, dateLess);
+			cout << "Timestamp search: " << endRecent - startRecent << " entries found" << endl;
+		}
+		else if (cmd[0] == 'g')
+		{
+			while (startRecent != endRecent)
+			{
+				cout << startRecent->entry << '|' << startRecent->entry << '|' << startRecent->date << '|' << startRecent->cat
+					<< '|' << startRecent->msg << endl;
+				startRecent++;
+			}
 		}
 	}
-	asdfasdfasd
-
+	
 	void print_log()
 	{
-		for (size_t i = 0; i < sortedTS.size(); i++)
+		for (size_t i = 0; i < masterList.size(); i++)
 		{
-			cout << sortedTS[i]->date << sortedTS[i]->cat << sortedTS[i]->msg << endl;
+			cout << masterList[i].date << masterList[i].cat << masterList[i].msg << endl;
 			//cout << masterList[i].numDate << endl;
 		}
 	}
