@@ -17,6 +17,8 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
+	std::ios_base::sync_with_stdio(false);
+
 	ifstream input(argv[1]);
 	LogSearch loog;
 	loog.read_in(input);
