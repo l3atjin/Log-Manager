@@ -1,0 +1,14 @@
+﻿  logman.cpp
+c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\algorithm(3216): warning C4244: 'argument': conversion from 'const _Ty' to 'int', possible loss of data
+          with
+          [
+              _Ty=__int64
+          ]
+  c:\users\susan\documents\eecs281\project3\project3\logsearch.h(272): note: see reference to function template instantiation '_FwdIt std::upper_bound<std::_Vector_iterator<std::_Vector_val<std::_Simple_types<_Ty>>>,__int64,CompareIndex>(_FwdIt,_FwdIt,const __int64 &,_Pr)' being compiled
+          with
+          [
+              _FwdIt=std::_Vector_iterator<std::_Vector_val<std::_Simple_types<int>>>,
+              _Ty=int,
+              _Pr=CompareIndex
+          ]
+  Project3.vcxproj -> C:\Users\Susan\Documents\EECS281\Project3\Debug\Project3.exe
