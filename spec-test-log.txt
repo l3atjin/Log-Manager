@@ -9,10 +9,15 @@
 12:15:20:56:50|UI-PANE1|Click event served.
 04:25:21:53:21|Thread|Thread #4 acquired lock #3
 07:02:10:12:43|PGM|Beginning master election.
+07:02:10:12:43|PGM|Beginning master election.
 07:02:10:13:00|PGM|Finished master election (master hostname=CAEN1695-p14).
+07:02:10:13:00|pGM|Finished master election (master hostname=CAEN1695-p14).
 04:25:21:55:36|Thread|Thread #4 closing.
 04:25:21:55:36|Thread|Interrupt event on CPU 3
 04:25:21:55:37|Thread|Thread #12 joined on thread #4
 08:23:12:03:15|TCP|Connection to client lost. (CID #8432)
 01:23:10:03:00|ALRM|Alarm event raised by process (PID #5432)
-04:25:21:55:50|Thread|Thread #10 attempted to grab lock #3 held by thread #4
+04:25:21:55:50|a|Thread #10 attempted to grab lock #3 held by thread #4
+08:25:21:55:50|d|Thread #10 attempted to grab lock #3 held by thread #4
+08:25:21:55:50|b|Thread #10 attempted to grab lock #3 held by thread #4
+08:25:21:55:50|c|Thread #10 attempted to grab lock #3 held by thread #4

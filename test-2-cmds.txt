@@ -1,0 +1,20 @@
+k Thread #10 attempted to grab lock #3 held by thread #4
+g
+r
+m 08:26:21:55:50
+g
+r
+k *(*(**(*master()()()()(
+k a 10
+e 5
+b 5
+d 5
+l
+s
+p
+k interrupt
+t 01:07:08:12:00|12:15:20:56:50
+r
+s
+p
+q

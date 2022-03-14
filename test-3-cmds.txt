@@ -1,0 +1,21 @@
+r
+g
+c cat
+g
+r
+s
+c ui
+c 
+c '
+# asdfaf
+# asfadsf
+# asdfasd
+k             window       
+k             FOCUS          
+k thread        call
+k ......... ......focus123412341
+k ......... ......focus((((((( ui
+t 00:00:00:00:00|04:25:21:54:211
+t 00:00:00:00:000|04:25:21:54:21
+q
+

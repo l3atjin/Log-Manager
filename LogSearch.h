@@ -5,6 +5,8 @@
 #include <queue>
 #include <deque>
 #include <string>
+#include <string.h>
+#include <cstring>
 #include <cmath>
 #include <iostream>
 #include <algorithm>
@@ -18,6 +20,10 @@
 #include <iterator>
 
 using namespace std;
+// Everyone that wants to use strcasecmp() needs this include,
+// Visual Studio or not.
+// Create strcasecmp() ONLY for people using Visual Studio.
+// Unix, Linux (CAEN) and MacOS already have it.
 
 
 
@@ -30,6 +36,17 @@ struct Log
 	long long numDate;
 };
 
+string lowercase(string str)
+{
+	for (size_t i = 0; i < str.size(); i++)
+	{
+		if (isalnum(str[i]))
+		{
+			str[i] = char(tolower(str[i]));
+		}
+	}
+	return str;
+}
 
 class CompareTS
 {
@@ -51,11 +68,11 @@ public:
 		}
 		else if (l1.numDate == l2.numDate)
 		{
-			if (l1.cat < l2.cat)
+			if (lowercase(l1.cat) < lowercase(l2.cat))
 			{
 				return true;
 			}
-			else if (l1.cat == l2.cat)
+			else if (lowercase(l1.cat) == lowercase(l2.cat))
 			{
 				return l1.entry < l2.entry;
 			}
@@ -74,7 +91,7 @@ public:
 	Compare(vector<Log> &vec_in)
 		: vec(vec_in) {}
 
-	bool operator()(int lhs, int rhs) const
+	bool operator()(const int &lhs, const int &rhs) const
 	{
 		if (vec[lhs].numDate < vec[rhs].numDate)
 		{
@@ -136,11 +153,11 @@ private:
 	vector<Log>::iterator endRecent;
 	vector<size_t>::iterator startCK;
 	vector<size_t>::iterator endCK;
-	
+
 	bool isCat = false;
 	bool isKey = false;
 	bool didCK = false;
-	
+
 public:
 	size_t logSize;
 	bool searched = false;
@@ -148,35 +165,19 @@ public:
 	CompareMaster compFull;
 	LogSearch() {}
 
-	string lowercase(string str)
+	
+
+	string parse(string str)
 	{
 		for (size_t i = 0; i < str.size(); i++)
 		{
-			if (isalnum(str[i]))
+			if (!isalnum(str[i]))
+			{
+				str[i] = ' ';
+			}
+			else
 			{
 				str[i] = char(tolower(str[i]));
-			}
-		}
-		return str;
-	}
-
-	string parse(string &str)
-	{
-		string temp = str;
-		str = "";
-		bool spaced = true;
-		for (size_t i = 0; i < temp.size(); i++)
-		{
-			if (isalnum(temp[i]))
-			{
-				temp[i] = char(tolower(temp[i]));
-				str += temp[i];
-				spaced = false;
-			}
-			else if (!spaced)
-			{
-				str += ' ';
-				spaced = true;
 			}
 		}
 		return str;
@@ -222,7 +223,7 @@ public:
 		else if (cmd[0] == 'p') // O(n)
 		{
 			print_excerpt();
-		} 
+		}
 		else if (cmd[0] == 'c') // need hash
 		{
 			if (!isCat)
@@ -234,6 +235,7 @@ public:
 				isCat = true;
 			}
 			string cat = cmd.substr(2);
+			//cat.pop_back();
 			auto it = searchCat.find(lowercase(cat));
 			if (it == searchCat.end())
 			{
@@ -241,6 +243,7 @@ public:
 				startCK = hmm.begin();
 				endCK = hmm.end();
 				didCK = true;
+				searched = true;
 				cout << "Category search: " << 0 << " entries found" << '\n';
 				return;
 			}
@@ -249,7 +252,7 @@ public:
 			didCK = true;
 			searched = true;
 			cout << "Category search: " << it->second.size() << " entries found" << '\n';
-			
+
 		}
 		else if (cmd[0] == 'k') // need hash
 		{
@@ -258,44 +261,37 @@ public:
 				for (size_t i = 0; i < masterList.size(); i++)
 				{
 					//cout << masterList[i].cat << '\n';
-					stringstream s1(masterList[i].cat);
-					string word1;
-					while (s1 >> word1)
+					
+					string word1 = parse(masterList[i].cat);
+					stringstream s1(word1);
+					string keyword;
+					while (s1 >> keyword)
 					{
+						//cout << keyword << " ";
 						//cout << "hi" << '\n';
-						parse(word1);
-						stringstream s2(word1);
-						string keyword;
-						while (s2 >> keyword)
+						if (searchKey[keyword].empty())
 						{
-							if (searchKey[keyword].empty())
-							{
-								searchKey[keyword].push_back(i);
-							}
-							else if (searchKey[keyword].back() != i)
-							{
-								searchKey[keyword].push_back(i);
-							}
+							searchKey[keyword].push_back(i);
+						}
+						else if (searchKey[keyword].back() != i)
+						{
+							searchKey[keyword].push_back(i);
 						}
 					}
-					stringstream s(masterList[i].msg);
-					string word;
+					//cout << '\n';
+					string word = parse(masterList[i].msg);
+					stringstream s(word);
 					//cout << masterList[i].msg << '\n';
-					while (s >> word)
+					while (s >> keyword)
 					{
-						parse(word);
-						string keyword;
-						stringstream s2(word);
-						while (s2 >> keyword)
+						//cout << keyword << " ";
+						if (searchKey[keyword].empty())
 						{
-							if (searchKey[keyword].empty())
-							{
-								searchKey[keyword].push_back(i);
-							}
-							else if (searchKey[keyword].back() != i)
-							{
-								searchKey[keyword].push_back(i);
-							}
+							searchKey[keyword].push_back(i);
+						}
+						else if (searchKey[keyword].back() != i)
+						{
+							searchKey[keyword].push_back(i);
 						}
 					}
 					//cout << '\n';
@@ -304,31 +300,22 @@ public:
 			}
 			searched = true;
 			vector<string> input;
-			string key = cmd.substr(2);
+			string key = parse(cmd.substr(2));
 			//cout << key << '\n';
 			stringstream q(key);
-			string word;
-			while (q >> word)
+			string keyword;
+			while (q >> keyword)
 			{
-				//cout << word << '\n';
-				parse(word);
-				//cout << word << '\n';
-				stringstream s2(word);
-				string keyword;
-				while (s2 >> keyword)
+				if (searchKey.find(keyword) == searchKey.end())
 				{
-					//cout << keyword << '\n';
-					if (searchKey.find(keyword) == searchKey.end())
-					{
-						vector<size_t> hmm;
-						startCK = hmm.begin();
-						endCK = hmm.end();
-						didCK = true;
-						cout << "Keyword search: 0 entries found" << '\n';
-						return;
-					}
-					input.push_back(keyword);
+					vector<size_t> hmm;
+					startCK = hmm.begin();
+					endCK = hmm.end();
+					didCK = true;
+					cout << "Keyword search: 0 entries found" << '\n';
+					return;
 				}
+				input.push_back(keyword);
 			}
 			if (input.size() == 1)
 			{
@@ -339,12 +326,11 @@ public:
 				return;
 			}
 			vector<size_t> temp(searchKey[input[0]].begin(), searchKey[input[0]].end());
-			
-			//set_intersection(searchKey[input[0]].begin(), searchKey[input[0]].end(), searchKey[input[1]].begin(), searchKey[input[1]].end(), back_inserter(result));
 			for (size_t i = 1; i < input.size(); i++)
 			{
 				resultKey.clear();
 				set_intersection(temp.begin(), temp.end(), searchKey[input[i]].begin(), searchKey[input[i]].end(), back_inserter(resultKey));
+				// use swap 
 				temp = resultKey;
 			}
 			startCK = resultKey.begin();
@@ -387,14 +373,14 @@ public:
 			string str = cmd.substr(2);
 			int in = stoi(str);
 			int size = static_cast<int>(excerptList.size());
-			if (in >= 0 || in < size)
+			if (in >= 0 && in < size)
 			{
 				excerptList.erase(excerptList.begin() + in);
 				cout << "Deleted excerpt list entry " << in << '\n';
 			}
 			else
 			{
-				cerr << "Invalid input. Try again." << endl;
+				cerr << "Invalid input. Try again." << '\n';
 				return;
 			}
 		}
@@ -403,7 +389,7 @@ public:
 			string str = cmd.substr(2);
 			int in = stoi(str);
 			int size = static_cast<int>(excerptList.size());
-			if (in >= 0 || in < size)
+			if (in >= 0 && in < size)
 			{
 				excerptList.push_front(excerptList[in]);
 				excerptList.erase(excerptList.begin() + in + 1);
@@ -411,7 +397,7 @@ public:
 			}
 			else
 			{
-				cerr << "Invalid input. Try again." << endl;
+				cerr << "Invalid input. Try again." << '\n';
 				return;
 			}
 		}
@@ -420,7 +406,7 @@ public:
 			string str = cmd.substr(2);
 			int in = stoi(str);
 			int size = static_cast<int>(excerptList.size());
-			if (in >= 0 || in < size)
+			if (in >= 0 && in < size)
 			{
 				excerptList.push_back(excerptList[in]);
 				excerptList.erase(excerptList.begin() + in);
@@ -428,7 +414,7 @@ public:
 			}
 			else
 			{
-				cerr << "Invalid input. Try again." << endl;
+				cerr << "Invalid input. Try again." << '\n';
 				return;
 			}
 		}
@@ -459,7 +445,7 @@ public:
 				cout << "excerpt list sorted" << '\n';
 				cout << "(previously empty)" << '\n';
 			}
-			
+
 		}
 		else if (cmd[0] == 'l')  // O(1)
 		{
@@ -483,8 +469,8 @@ public:
 			// maybe fix it
 			string str = cmd.substr(2, 2) + cmd.substr(5, 2) + cmd.substr(8, 2) + cmd.substr(11, 2) + cmd.substr(14, 2);
 			string str1 = cmd.substr(17, 2) + cmd.substr(20, 2) + cmd.substr(23, 2) + cmd.substr(26, 2) + cmd.substr(29, 2);
-			long long num = stoi(str);
-			long long num1 = stoi(str1);
+			long long num = stoll(str);
+			long long num1 = stoll(str1);
 			Log temp;
 			Log temp1;
 			temp.numDate = num;
@@ -519,37 +505,37 @@ public:
 		}
 		else if (cmd[0] == 'g') // o(n)
 		{
-		if (searched)
-		{
-			if (!didCK)
+			if (searched)
 			{
-				auto start = startRecent;
-				auto end = endRecent;
-				while (start != end)
+				if (!didCK)
 				{
-					cout << start->entry << '|'
-						<< start->date << '|' << start->cat
-						<< '|' << start->msg << '\n';
-					start++;
+					auto start = startRecent;
+					auto end = endRecent;
+					while (start != end)
+					{
+						cout << start->entry << '|'
+							<< start->date << '|' << start->cat
+							<< '|' << start->msg << '\n';
+						start++;
+					}
+				}
+				else
+				{
+					auto start = startCK;
+					auto end = endCK;
+					while (start != end)
+					{
+						cout << masterList[*start].entry << '|'
+							<< masterList[*start].date << '|' << masterList[*start].cat
+							<< '|' << masterList[*start].msg << '\n';
+						start++;
+					}
 				}
 			}
-			else
-			{
-				auto start = startCK;
-				auto end = endCK;
-				while (start != end)
-				{
-					cout << masterList[*start].entry << '|'
-						<< masterList[*start].date << '|' << masterList[*start].cat
-						<< '|' << masterList[*start].msg << '\n';
-					start++;
-				}
-			}
-		}
-		
+
 		}
 	}
-	
+
 	void print_log()
 	{
 		for (size_t i = 0; i < masterList.size(); i++)

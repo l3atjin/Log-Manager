@@ -1,0 +1,3 @@
+01:07:08:12:00|UI-PANE2|Window received focus.
+04:25:21:55:50|A|Thread #10 attempted to grab lock #3 held by thread #4
+04:25:21:54:21|Thread|Thread #12 blocking on join call to thread #4
